@@ -1,8 +1,14 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# Stop the running container (if any)
-Containerid= 'docker ps | awk -F " " '{PRINT $1}'' 
+echo "Stopping container..."
+# Get the container ID of the running container, ignoring the header line
+container_id=$(docker ps --format "{{.ID}}" | awk 'NR==1 {next} NR==2 {print $1}')
 
-#removing existing container
-docker rm -f $Containerid
+if [ -n "$container_id" ]; then
+      docker rm -f $container_id
+       echo "Container $container_id stopped and removed."
+else
+    echo "No running container found."
+fi
+     
