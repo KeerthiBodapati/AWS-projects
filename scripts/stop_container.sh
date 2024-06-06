@@ -2,4 +2,7 @@
 set -e
 
 # Stop the running container (if any)
-echo "Hi"
+Containerid= 'docker ps | awk -F " " '{PRINT $1}''
+
+#removing existing container
+docker rm -f $Containerid
