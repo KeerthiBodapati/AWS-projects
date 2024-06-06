@@ -8,11 +8,29 @@ hooks:
         set -euo pipefail
 
         echo "Stopping container..."
-        # Get the container ID of the running container, ignoring the header line
-        container_id=$(docker ps --format "{{.ID}}" | awk 'NR==1 {next} NR==2 {print $1}')
-         docker rm -f $container_id
-      timeout: 300
+        start_time=$(date +%s)
+        date
+
+        # Get the container ID of the running container
+        container_id=$(docker ps -q)
+
+        if [ -n "$container_id" ]; then
+          echo "Container ID to stop: $container_id"
+          stop_start_time=$(date +%s)
+          docker rm -f $container_id
+          stop_end_time=$(date +%s)
+          echo "Container $container_id stopped and removed."
+          echo "Time taken to stop container: $((stop_end_time - stop_start_time)) seconds"
+        else
+          echo "No running container found."
+        fi
+
+        end_time=$(date +%s)
+        echo "Total time taken for ApplicationStop: $((end_time - start_time)) seconds"
+        date
+      timeout: 600
       runas: root
+    
   AfterInstall:
     - location: scripts/start_container.sh
       timeout: 300
